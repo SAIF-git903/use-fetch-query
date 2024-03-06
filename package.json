@@ -1,11 +1,11 @@
 {
   "name": "use-fetch-query",
-  "version": "1.0.7",
+  "version": "1.1.5",
   "description": "A lightweight hook for making HTTP requests using the fetch API in React",
-  "main": "dist/use-fetch-query-transpiled.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src/use-fetch-query.js --out-file dist/index.js"
+    "build": "tsc"
   },
   "author": "Saif Ali",
   "license": "ISC",
@@ -15,6 +15,13 @@
     "fetch-query",
     "API"
   ],
+  "devDependencies": {
+    "@types/react": "^18.2.63",
+    "react": "^18.2.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SAIF-git903/use-fetch-query.git"
