@@ -15,24 +15,31 @@ npm i use-fetch-query
 ```javascript
 import { useQuery } from "use-fetch-query";
 
-// Example usage:
-useQuery("https://api.example.com/data", {
-  method: "GET",
-  headers: {
-    Authorization: "Bearer <your-token>",
-  },
-  queryParams: {
-    param1: "value1",
-  },
-})
-  .then((data) => {
-    // Handle API response
-    console.log(data);
-  })
-  .catch((error) => {
-    // Handle error
-    console.error(error);
+function MyComponent() {
+  const { data, error, isLoading } = useQuery("https://api.example.com/data", {
+    method: "GET",
   });
+
+  // Handle loading state
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Handle error
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  // Render data
+  return (
+    <div>
+      <h1>Data:</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+}
+
+export default MyComponent;
 ```
 
 ## Parameters
