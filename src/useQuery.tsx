@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react";
-import { useContext } from "react";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { useContext, useEffect, useState } from "react";
 import { QueryContext } from "./provider";
-import { Options } from "./types";
 
-export function useQuery(url?: string, options: Options = {}) {
+type Options = {
+  method?: "GET" | "PUT" | "PATCH" | "DELETE" | "POST";
+  headers?: Record<string, string>;
+  body?: any;
+  queryParams?: Record<string, string>;
+  url?: string;
+  timeout?: number;
+};
+
+export function useQuery(options: Options = {}) {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -11,82 +19,81 @@ export function useQuery(url?: string, options: Options = {}) {
   const context = useContext(QueryContext);
 
   useEffect(() => {
-    let controller: AbortController;
+    let source = axios.CancelToken.source();
 
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
 
-      const apiUrl = getUrl(url, context);
+      if (options.method === "GET") {
+        const apiUrl = getUrl(options.url, context);
+        const { method = "GET", headers = {}, body, timeout } = options;
 
-      const {
-        method = "GET",
-        headers = {},
-        body,
-        queryParams,
-        timeout,
-      } = options;
+        const axiosOptions: AxiosRequestConfig = {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            ...headers,
+          },
+          cancelToken: source.token,
+        };
 
-      controller = new AbortController();
-      const signal = controller.signal;
+        if (method !== "GET") {
+          axiosOptions.data = body;
+        }
 
-      const fetchOptions: RequestInit = {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          ...headers,
-        },
-        signal,
-      };
-
-      if (method !== "GET") {
-        fetchOptions.body = JSON.stringify(body);
-      }
-
-      try {
-        let fetchPromise: Promise<Response | any>;
         if (timeout && method !== "GET") {
-          fetchPromise = Promise.race([
-            fetch(apiUrl, fetchOptions),
-            new Promise((_, reject) => {
-              const timeoutId = setTimeout(() => {
-                controller.abort();
-                reject(new Error("Request timed out"));
-              }, timeout);
-              // Clear the timeout when the fetch completes
-              fetchPromise.then(() => clearTimeout(timeoutId));
-            }),
-          ]);
-        } else {
-          fetchPromise = fetch(apiUrl, fetchOptions);
+          axiosOptions.timeout = timeout;
         }
 
-        const response = await fetchPromise;
+        try {
+          const response: AxiosResponse = await axios(apiUrl, axiosOptions);
 
-        if (!response.ok) {
-          setError("Network response was not ok");
+          setData(response.data);
+        } catch (error: any) {
+          if (axios.isCancel(error)) {
+            // Request cancelled, no need to set error
+          } else if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            setError("Network response was not ok");
+          } else if (error.request) {
+            // The request was made but no response was received
+            setError("No response received");
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            setError("An error occurred");
+          }
+        } finally {
+          setIsLoading(false);
         }
-
-        const responseData = await response.json();
-        setData(responseData);
-      } catch (error: any) {
-        setError(error.message || "An error occurred");
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchData();
 
     return () => {
-      if (controller) {
-        // Cleanup function to abort ongoing requests if component re-renders or unmounts
-        controller.abort();
-      }
+      source.cancel("Component unmounted");
     };
-  }, []);
+  }, [options.method, options.url, context]);
 
-  return { data, error, isLoading };
+  // Function to make a POST request
+  const postData = async (payload: any) => {
+    try {
+      const apiUrl = getUrl(options.url, context);
+      const response: AxiosResponse = await axios.post(apiUrl, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+      });
+      setData(response.data);
+    } catch (error: any) {
+      setError(error.message || "An error occurred");
+    }
+  };
+
+  return { data, error, isLoading, postData };
 }
 
 function getUrl(url?: string, context?: any): string {

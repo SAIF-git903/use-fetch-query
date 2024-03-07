@@ -16,8 +16,9 @@ npm i use-fetch-query
 import { useQuery } from "use-fetch-query";
 
 function MyComponent() {
-  const { data, error, isLoading } = useQuery("https://api.example.com/data", {
+  const { data, error, isLoading } = useQuery({
     method: "GET",
+    url: "https://api.example.com/data",
   });
 
   // Handle loading state
@@ -40,6 +41,24 @@ function MyComponent() {
 }
 
 export default MyComponent;
+```
+
+## POST request
+
+```javascript
+function App() {
+  const { data, postData } = useQuery({ method: "GET" });
+
+  useEffect(() => {
+    console.log(data, "data");
+  }, [data]);
+
+  return (
+    <div>
+      <button onClick={() => postData({ hi: "send me" })}>Make a post</button>
+    </div>
+  );
+}
 ```
 
 # QueryProvider
