@@ -42,6 +42,33 @@ function MyComponent() {
 export default MyComponent;
 ```
 
+# QueryProvider
+
+The `QueryProvider` component is a part of the `use-fetch-query` package, providing context for making HTTP requests using the fetch API in React applications.
+
+## Usage
+
+```javascript
+import React from "react";
+import ReactDOM from "react-dom";
+import { QueryProvider } from "use-fetch-query";
+
+// Define the client configuration
+// This url in client configuration is the base URL if you don't specify the url in useQuery("https://api.example.com/data")
+
+const client = {
+  url: "https://api.example.com",
+};
+
+// Render your application wrapped with QueryProvider
+ReactDOM.render(
+  <QueryProvider client={client}>
+    <App />
+  </QueryProvider>,
+  document.getElementById("root")
+);
+```
+
 ## Parameters
 
 - `url` (string): The URL to which the request will be sent.
