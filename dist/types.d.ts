@@ -15,6 +15,7 @@ export type Options = {
   body?: any;
   queryParams?: Record<string, string>;
   timeout?: number;
+  url?: string;
 };
 
 export type KeyValueMap = Record<string, string>;
@@ -26,10 +27,12 @@ export type ClientProviderParamsI = {
 };
 
 // Declaration for useQuery function
-export declare function useQuery(
-  url?: string,
-  options?: Options
-): { data: any; error: string | null; isLoading: boolean };
+export declare function useQuery(options?: Options): {
+  data: any;
+  error: string | null;
+  isLoading: boolean;
+  postData: (payload?: any) => void;
+};
 
 // Declaration for QueryProvider function
 export declare function QueryProvider(props: QueryProviderProps): JSX.Element;
