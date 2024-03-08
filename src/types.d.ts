@@ -37,4 +37,9 @@ export declare function QueryProvider(props: QueryProviderProps): JSX.Element;
 // Declaration for QueryContext constant
 export declare const QueryContext: React.Context<any>;
 
-export declare const ClientProviderConfig: ClientProviderParamsI;
+export declare class ClientProviderConfig {
+  url: string;
+  authToken?: string;
+  defaultHeaders?: Record<string, string>;
+  constructor({ url, authToken, defaultHeaders }: ClientProviderParamsI);
+}
