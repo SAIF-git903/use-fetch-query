@@ -11,4 +11,4 @@ function QueryProvider({ children, client }: QueryProviderProps) {
   );
 }
 
-export { QueryProvider };
+export default QueryProvider;

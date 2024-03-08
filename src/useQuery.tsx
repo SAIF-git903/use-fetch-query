@@ -1,16 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useContext, useEffect, useState } from "react";
 import { QueryContext } from "./provider";
-import { ClientProviderParamsI, KeyValueMap } from "./types";
-
-type Options = {
-  method?: "GET" | "PUT" | "PATCH" | "DELETE" | "POST";
-  headers?: Record<string, string>;
-  body?: any;
-  queryParams?: Record<string, string>;
-  url?: string;
-  timeout?: number;
-};
+import { ClientProviderParamsI, KeyValueMap, Options } from "./types";
 
 export function useQuery(options: Options = {}) {
   const [data, setData] = useState<any>(null);
@@ -18,9 +9,6 @@ export function useQuery(options: Options = {}) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const context: ClientProviderParamsI | any = useContext(QueryContext);
-
-  const { method = "GET", headers = {}, body, timeout, queryParams } = options;
-  const apiUrl = getUrl(options.url, context, queryParams);
 
   useEffect(() => {
     let source = axios.CancelToken.source();
@@ -30,12 +18,15 @@ export function useQuery(options: Options = {}) {
       setError(null);
 
       if (options.method === "GET") {
+        const apiUrl = getUrl(options.url, context);
+        const { method = "GET", headers = {}, body, timeout } = options;
+
         const axiosOptions: AxiosRequestConfig = {
           method,
           headers: {
             "Content-Type": "application/json",
             ...headers,
-            ...context.defaultHeaders,
+            ...context?.defaultHeaders,
             Authorization: context?.authToken
               ? `Bearer ${context?.authToken}`
               : null,
@@ -83,13 +74,14 @@ export function useQuery(options: Options = {}) {
   }, [options.method, options.url, context]);
 
   // Function to make a POST request
-  const postData = async (payload?: any) => {
+  const postData = async (payload: any) => {
     try {
+      const apiUrl = getUrl(options.url, context);
       const response: AxiosResponse = await axios.post(apiUrl, payload, {
         headers: {
           "Content-Type": "application/json",
-          ...options.headers,
-          ...context.defaultHeaders,
+          ...options?.headers,
+          ...context?.defaultHeaders,
           Authorization: context?.authToken
             ? `Bearer ${context?.authToken}`
             : null,

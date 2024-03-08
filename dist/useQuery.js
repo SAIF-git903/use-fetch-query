@@ -61,19 +61,18 @@ function useQuery(options) {
     var _b = (0, react_1.useState)(null), error = _b[0], setError = _b[1];
     var _c = (0, react_1.useState)(true), isLoading = _c[0], setIsLoading = _c[1];
     var context = (0, react_1.useContext)(provider_1.QueryContext);
-    var _d = options.method, method = _d === void 0 ? "GET" : _d, _e = options.headers, headers = _e === void 0 ? {} : _e, body = options.body, timeout = options.timeout, queryParams = options.queryParams;
-    var apiUrl = getUrl(options.url, context, queryParams);
     (0, react_1.useEffect)(function () {
-        var _a;
-        var source = (_a = axios_1.default === null || axios_1.default === void 0 ? void 0 : axios_1.default.CancelToken) === null || _a === void 0 ? void 0 : _a.source();
+        var source = axios_1.default.CancelToken.source();
         var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-            var axiosOptions, response, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var apiUrl, _a, method, _b, headers, body, timeout, axiosOptions, response, error_1;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         setIsLoading(true);
                         setError(null);
                         if (!(options.method === "GET")) return [3 /*break*/, 5];
+                        apiUrl = getUrl(options.url, context);
+                        _a = options.method, method = _a === void 0 ? "GET" : _a, _b = options.headers, headers = _b === void 0 ? {} : _b, body = options.body, timeout = options.timeout;
                         axiosOptions = {
                             method: method,
                             headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, headers), context === null || context === void 0 ? void 0 : context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
@@ -87,17 +86,17 @@ function useQuery(options) {
                         if (timeout && method !== "GET") {
                             axiosOptions.timeout = timeout;
                         }
-                        _a.label = 1;
+                        _c.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, 4, 5]);
+                        _c.trys.push([1, 3, 4, 5]);
                         return [4 /*yield*/, (0, axios_1.default)(apiUrl, axiosOptions)];
                     case 2:
-                        response = _a.sent();
+                        response = _c.sent();
                         setData(response.data);
                         return [3 /*break*/, 5];
                     case 3:
-                        error_1 = _a.sent();
-                        if (axios_1.default === null || axios_1.default === void 0 ? void 0 : axios_1.default.isCancel(error_1)) {
+                        error_1 = _c.sent();
+                        if (axios_1.default.isCancel(error_1)) {
                             // Request cancelled, no need to set error
                         }
                         else if (error_1.response) {
@@ -123,16 +122,17 @@ function useQuery(options) {
         }); };
         fetchData();
         return function () {
-            source === null || source === void 0 ? void 0 : source.cancel("Component unmounted");
+            source.cancel("Component unmounted");
         };
     }, [options.method, options.url, context]);
     // Function to make a POST request
     var postData = function (payload) { return __awaiter(_this, void 0, void 0, function () {
-        var response, error_2;
+        var apiUrl, response, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
+                    apiUrl = getUrl(options.url, context);
                     return [4 /*yield*/, axios_1.default.post(apiUrl, payload, {
                             headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers), context === null || context === void 0 ? void 0 : context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
                                     ? "Bearer ".concat(context === null || context === void 0 ? void 0 : context.authToken)

@@ -1,9 +1,9 @@
-import { ClientProviderParamsI } from "./types";
+import { ClientProviderParamsI, KeyValueMap } from "./types";
 
 export default class ClientProviderConfig {
   url: string;
   authToken?: string;
-  defaultHeaders?: Record<string, string>;
+  defaultHeaders?: KeyValueMap;
 
   constructor({ url, authToken, defaultHeaders }: ClientProviderParamsI) {
     this.url = url;

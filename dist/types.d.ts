@@ -10,8 +10,8 @@ export type Options = {
   headers?: Record<string, string>;
   body?: any;
   queryParams?: Record<string, string>;
-  timeout?: number;
   url?: string;
+  timeout?: number;
 };
 
 export type KeyValueMap = Record<string, string>;

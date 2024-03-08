@@ -1,4 +1,4 @@
-import { QueryProvider } from "./provider";
+import QueryProvider from "./provider";
 import { useQuery } from "./useQuery";
 import ClientProviderConfig from "./providerClass";
 
