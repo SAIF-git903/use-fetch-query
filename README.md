@@ -47,7 +47,7 @@ export default MyComponent;
 
 ```javascript
 function App() {
-  const { data, postData } = useQuery({ method: "GET" });
+  const { data, postData } = useQuery();
 
   useEffect(() => {
     console.log(data, "data");
@@ -68,24 +68,31 @@ The `QueryProvider` component is a part of the `use-fetch-query` package, provid
 ## Usage
 
 ```javascript
+import App from "./App";
 import React from "react";
-import ReactDOM from "react-dom";
-import { QueryProvider } from "use-fetch-query";
+import ReactDOM from "react-dom/client";
+import { QueryProvider, ClientProviderConfig } from "use-fetch-query";
 
-// Define the client configuration
-// This url in client configuration is the base URL if you don't specify the url in useQuery("https://api.example.com/data")
-
-const client = {
-  url: "https://api.example.com",
-};
-
-// Render your application wrapped with QueryProvider
-ReactDOM.render(
-  <QueryProvider client={client}>
-    <App />
-  </QueryProvider>,
-  document.getElementById("root")
+const root = ReactDOM.createRoot(
+  document.getElementById("root") as HTMLElement
 );
+
+const clientConfig = new ClientProviderConfig({
+  url: "http://localhost",
+  defaultHeaders: {
+    name: "Content-Type",
+    value: "application/json",
+  },
+});
+
+root.render(
+  <React.StrictMode>
+    <QueryProvider client={clientConfig}>
+      <App />
+    </QueryProvider>
+  </React.StrictMode>
+);
+
 ```
 
 ## Parameters

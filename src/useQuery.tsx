@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useContext, useEffect, useState } from "react";
 import { QueryContext } from "./provider";
+import { ClientProviderParamsI, KeyValueMap } from "./types";
 
 type Options = {
   method?: "GET" | "PUT" | "PATCH" | "DELETE" | "POST";
@@ -16,7 +17,10 @@ export function useQuery(options: Options = {}) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const context = useContext(QueryContext);
+  const context: ClientProviderParamsI | any = useContext(QueryContext);
+
+  const { method = "GET", headers = {}, body, timeout, queryParams } = options;
+  const apiUrl = getUrl(options.url, context, queryParams);
 
   useEffect(() => {
     let source = axios.CancelToken.source();
@@ -26,14 +30,15 @@ export function useQuery(options: Options = {}) {
       setError(null);
 
       if (options.method === "GET") {
-        const apiUrl = getUrl(options.url, context);
-        const { method = "GET", headers = {}, body, timeout } = options;
-
         const axiosOptions: AxiosRequestConfig = {
           method,
           headers: {
             "Content-Type": "application/json",
             ...headers,
+            ...context.defaultHeaders,
+            Authorization: context?.authToken
+              ? `Bearer ${context?.authToken}`
+              : null,
           },
           cancelToken: source.token,
         };
@@ -78,13 +83,16 @@ export function useQuery(options: Options = {}) {
   }, [options.method, options.url, context]);
 
   // Function to make a POST request
-  const postData = async (payload: any) => {
+  const postData = async (payload?: any) => {
     try {
-      const apiUrl = getUrl(options.url, context);
       const response: AxiosResponse = await axios.post(apiUrl, payload, {
         headers: {
           "Content-Type": "application/json",
           ...options.headers,
+          ...context.defaultHeaders,
+          Authorization: context?.authToken
+            ? `Bearer ${context?.authToken}`
+            : null,
         },
       });
       setData(response.data);
@@ -96,14 +104,29 @@ export function useQuery(options: Options = {}) {
   return { data, error, isLoading, postData };
 }
 
-function getUrl(url?: string, context?: any): string {
-  if (url) {
-    return url;
-  } else if (context && context.url) {
-    return context.url;
-  } else {
+function getUrl(
+  url?: string,
+  context?: any,
+  queryParams?: KeyValueMap
+): string {
+  if (!url && (!context || !context.url)) {
     throw new Error(
       "URL must be provided in useQuery or context.url must be set when Wrapping around QueryContext"
     );
   }
+
+  let $URL: string = url || context.url;
+
+  let queryString = "";
+  if (queryParams) {
+    const params = Object.entries(queryParams)
+      .map(
+        ([key, value]) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(value as any)}`
+      )
+      .join("&");
+    queryString = `?${params}`;
+  }
+
+  return `${$URL}${queryString}`;
 }

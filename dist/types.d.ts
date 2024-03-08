@@ -17,6 +17,14 @@ export type Options = {
   timeout?: number;
 };
 
+export type KeyValueMap = Record<string, string>;
+
+export type ClientProviderParamsI = {
+  url: string;
+  authToken?: string;
+  defaultHeaders?: KeyValueMap;
+};
+
 // Declaration for useQuery function
 export declare function useQuery(
   url?: string,
@@ -28,3 +36,5 @@ export declare function QueryProvider(props: QueryProviderProps): JSX.Element;
 
 // Declaration for QueryContext constant
 export declare const QueryContext: React.Context<any>;
+
+export declare const ClientProviderConfig: ClientProviderParamsI;
