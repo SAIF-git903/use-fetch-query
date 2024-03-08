@@ -64,7 +64,8 @@ function useQuery(options) {
     var _d = options.method, method = _d === void 0 ? "GET" : _d, _e = options.headers, headers = _e === void 0 ? {} : _e, body = options.body, timeout = options.timeout, queryParams = options.queryParams;
     var apiUrl = getUrl(options.url, context, queryParams);
     (0, react_1.useEffect)(function () {
-        var source = axios_1.default.CancelToken.source();
+        var _a;
+        var source = (_a = axios_1.default === null || axios_1.default === void 0 ? void 0 : axios_1.default.CancelToken) === null || _a === void 0 ? void 0 : _a.source();
         var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
             var axiosOptions, response, error_1;
             return __generator(this, function (_a) {
@@ -75,7 +76,7 @@ function useQuery(options) {
                         if (!(options.method === "GET")) return [3 /*break*/, 5];
                         axiosOptions = {
                             method: method,
-                            headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, headers), context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
+                            headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, headers), context === null || context === void 0 ? void 0 : context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
                                     ? "Bearer ".concat(context === null || context === void 0 ? void 0 : context.authToken)
                                     : null }),
                             cancelToken: source.token,
@@ -96,7 +97,7 @@ function useQuery(options) {
                         return [3 /*break*/, 5];
                     case 3:
                         error_1 = _a.sent();
-                        if (axios_1.default.isCancel(error_1)) {
+                        if (axios_1.default === null || axios_1.default === void 0 ? void 0 : axios_1.default.isCancel(error_1)) {
                             // Request cancelled, no need to set error
                         }
                         else if (error_1.response) {
@@ -122,7 +123,7 @@ function useQuery(options) {
         }); };
         fetchData();
         return function () {
-            source.cancel("Component unmounted");
+            source === null || source === void 0 ? void 0 : source.cancel("Component unmounted");
         };
     }, [options.method, options.url, context]);
     // Function to make a POST request
@@ -133,7 +134,7 @@ function useQuery(options) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
                     return [4 /*yield*/, axios_1.default.post(apiUrl, payload, {
-                            headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, options.headers), context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
+                            headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers), context === null || context === void 0 ? void 0 : context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
                                     ? "Bearer ".concat(context === null || context === void 0 ? void 0 : context.authToken)
                                     : null }),
                         })];

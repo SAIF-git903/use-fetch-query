@@ -1,11 +1,7 @@
 import { ReactNode } from "react";
 
-export type Client = {
-  url: string;
-};
-
 export interface QueryProviderProps {
-  client: Client;
+  client: ClientProviderParamsI;
   children: ReactNode;
 }
 
