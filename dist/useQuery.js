@@ -46,12 +46,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useQuery = void 0;
-var axios_1 = __importDefault(require("axios"));
 var react_1 = require("react");
 var provider_1 = require("./provider");
 function useQuery(options) {
@@ -59,93 +55,80 @@ function useQuery(options) {
     if (options === void 0) { options = {}; }
     var _a = (0, react_1.useState)(null), data = _a[0], setData = _a[1];
     var _b = (0, react_1.useState)(null), error = _b[0], setError = _b[1];
-    var _c = (0, react_1.useState)(true), isLoading = _c[0], setIsLoading = _c[1];
+    var _c = (0, react_1.useState)(false), isLoading = _c[0], setIsLoading = _c[1];
     var context = (0, react_1.useContext)(provider_1.QueryContext);
     var _d = options.method, method = _d === void 0 ? "GET" : _d, _e = options.headers, headers = _e === void 0 ? {} : _e, body = options.body, timeout = options.timeout, queryParams = options.queryParams;
     var apiUrl = getUrl(options.url, context, queryParams);
     (0, react_1.useEffect)(function () {
-        var source = axios_1.default.CancelToken.source();
         var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-            var axiosOptions, response, error_1;
+            var response, responseData, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        setIsLoading(true);
                         setError(null);
-                        if (!(options.method === "GET")) return [3 /*break*/, 5];
-                        axiosOptions = {
-                            method: method,
-                            headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, headers), context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
-                                    ? "Bearer ".concat(context === null || context === void 0 ? void 0 : context.authToken)
-                                    : null }),
-                            cancelToken: source.token,
-                        };
-                        if (method !== "GET") {
-                            axiosOptions.data = body;
-                        }
-                        if (timeout && method !== "GET") {
-                            axiosOptions.timeout = timeout;
-                        }
+                        if (!(method === "GET")) return [3 /*break*/, 6];
+                        setIsLoading(true);
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, 4, 5]);
-                        return [4 /*yield*/, (0, axios_1.default)(apiUrl, axiosOptions)];
+                        _a.trys.push([1, 4, 5, 6]);
+                        return [4 /*yield*/, fetch(apiUrl, {
+                                method: method,
+                                headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, headers), context === null || context === void 0 ? void 0 : context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
+                                        ? "Bearer ".concat(context === null || context === void 0 ? void 0 : context.authToken)
+                                        : undefined }),
+                            })];
                     case 2:
                         response = _a.sent();
-                        setData(response.data);
-                        return [3 /*break*/, 5];
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return [4 /*yield*/, response.json()];
                     case 3:
-                        error_1 = _a.sent();
-                        if (axios_1.default.isCancel(error_1)) {
-                            // Request cancelled, no need to set error
-                        }
-                        else if (error_1.response) {
-                            // The request was made and the server responded with a status code
-                            // that falls out of the range of 2xx
-                            setError("Network response was not ok");
-                        }
-                        else if (error_1.request) {
-                            // The request was made but no response was received
-                            setError("No response received");
-                        }
-                        else {
-                            // Something happened in setting up the request that triggered an Error
-                            setError("An error occurred");
-                        }
-                        return [3 /*break*/, 5];
+                        responseData = _a.sent();
+                        setData(responseData);
+                        return [3 /*break*/, 6];
                     case 4:
+                        error_1 = _a.sent();
+                        setError(error_1.message || "An error occurred");
+                        return [3 /*break*/, 6];
+                    case 5:
                         setIsLoading(false);
                         return [7 /*endfinally*/];
-                    case 5: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         }); };
         fetchData();
-        return function () {
-            source.cancel("Component unmounted");
-        };
     }, [options.method, options.url, context]);
     // Function to make a POST request
     var postData = function (payload) { return __awaiter(_this, void 0, void 0, function () {
-        var response, error_2;
+        var response, responseData, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, axios_1.default.post(apiUrl, payload, {
-                            headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, options.headers), context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch(apiUrl, {
+                            method: "POST",
+                            headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, headers), context === null || context === void 0 ? void 0 : context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
                                     ? "Bearer ".concat(context === null || context === void 0 ? void 0 : context.authToken)
-                                    : null }),
+                                    : undefined }),
+                            body: JSON.stringify(payload),
                         })];
                 case 1:
                     response = _a.sent();
-                    setData(response.data);
-                    return [3 /*break*/, 3];
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return [4 /*yield*/, response.json()];
                 case 2:
+                    responseData = _a.sent();
+                    setData(responseData);
+                    return [3 /*break*/, 4];
+                case 3:
                     error_2 = _a.sent();
                     setError(error_2.message || "An error occurred");
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     }); };
@@ -159,12 +142,7 @@ function getUrl(url, context, queryParams) {
     var $URL = url || context.url;
     var queryString = "";
     if (queryParams) {
-        var params = Object.entries(queryParams)
-            .map(function (_a) {
-            var key = _a[0], value = _a[1];
-            return "".concat(encodeURIComponent(key), "=").concat(encodeURIComponent(value));
-        })
-            .join("&");
+        var params = new URLSearchParams(queryParams).toString();
         queryString = "?".concat(params);
     }
     return "".concat($URL).concat(queryString);

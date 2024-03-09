@@ -1,21 +1,17 @@
 import { ReactNode } from "react";
 
-export type Client = {
-  url: string;
-};
-
 export interface QueryProviderProps {
-  client: Client;
+  client: ClientProviderParamsI;
   children: ReactNode;
 }
 
 export type Options = {
   method?: "GET" | "PUT" | "PATCH" | "DELETE" | "POST";
-  headers?: Record<string, string>;
+  headers?: KeyValueMap;
   body?: any;
-  queryParams?: Record<string, string>;
-  timeout?: number;
+  queryParams?: KeyValueMap
   url?: string;
+  timeout?: number;
 };
 
 export type KeyValueMap = Record<string, string>;
