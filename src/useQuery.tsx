@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
+import getUrl from "./helpers";
 import { QueryContext } from "./provider";
-import { ClientProviderParamsI, KeyValueMap, Options } from "./types";
-
+import { ClientProviderParamsI, Options } from "./types";
 
 export function useQuery(options: Options = {}) {
   const [data, setData] = useState<any>(null);
@@ -10,13 +10,15 @@ export function useQuery(options: Options = {}) {
 
   const context: ClientProviderParamsI | any = useContext(QueryContext);
 
+  // Default Method is set to GET in case user don't provide one.
   const { method = "GET", headers = {}, body, timeout, queryParams } = options;
   const apiUrl = getUrl(options.url, context, queryParams);
 
+  // useEffect for handling GET request
   useEffect(() => {
     const fetchData = async () => {
       setError(null);
-      
+
       if (method === "GET") {
         setIsLoading(true);
         try {
@@ -28,7 +30,7 @@ export function useQuery(options: Options = {}) {
               ...context?.defaultHeaders,
               Authorization: context?.authToken
                 ? `Bearer ${context?.authToken}`
-                : undefined, // null headers are removed automatically
+                : undefined,
             },
           });
 
@@ -46,15 +48,14 @@ export function useQuery(options: Options = {}) {
       }
     };
 
-    
     fetchData();
   }, [options.method, options.url, context]);
 
-  // Function to make a POST request
-  const postData = async (payload?: any) => {
+  // Function to make a Execute a request
+  const executeRequest = async (method: string, payload?: any) => {
     try {
       const response = await fetch(apiUrl, {
-        method: "POST",
+        method,
         headers: {
           "Content-Type": "application/json",
           ...headers,
@@ -77,27 +78,17 @@ export function useQuery(options: Options = {}) {
     }
   };
 
-  return { data, error, isLoading, postData };
-}
+  const postData = async (payload?: any) => {
+    await executeRequest("POST", payload);
+  };
 
-function getUrl(
-  url?: string,
-  context?: any,
-  queryParams?: KeyValueMap
-): string {
-  if (!url && (!context || !context.url)) {
-    throw new Error(
-      "URL must be provided in useQuery or context.url must be set when Wrapping around QueryContext"
-    );
-  }
+  const putData = async (payload?: any) => {
+    await executeRequest("PUT", payload);
+  };
 
-  let $URL: string = url || context.url;
+  const patchData = async (payload?: any) => {
+    await executeRequest("PATCH", payload);
+  };
 
-  let queryString = "";
-  if (queryParams) {
-    const params = new URLSearchParams(queryParams).toString();
-    queryString = `?${params}`;
-  }
-
-  return `${$URL}${queryString}`;
+  return { data, error, isLoading, postData, putData, patchData };
 }

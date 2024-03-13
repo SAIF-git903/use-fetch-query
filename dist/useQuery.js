@@ -46,9 +46,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useQuery = void 0;
 var react_1 = require("react");
+var helpers_1 = __importDefault(require("./helpers"));
 var provider_1 = require("./provider");
 function useQuery(options) {
     var _this = this;
@@ -57,8 +61,10 @@ function useQuery(options) {
     var _b = (0, react_1.useState)(null), error = _b[0], setError = _b[1];
     var _c = (0, react_1.useState)(false), isLoading = _c[0], setIsLoading = _c[1];
     var context = (0, react_1.useContext)(provider_1.QueryContext);
+    // Default Method is set to GET in case user don't provide one.
     var _d = options.method, method = _d === void 0 ? "GET" : _d, _e = options.headers, headers = _e === void 0 ? {} : _e, body = options.body, timeout = options.timeout, queryParams = options.queryParams;
-    var apiUrl = getUrl(options.url, context, queryParams);
+    var apiUrl = (0, helpers_1.default)(options.url, context, queryParams);
+    // useEffect for handling GET request
     (0, react_1.useEffect)(function () {
         var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
             var response, responseData, error_1;
@@ -100,15 +106,15 @@ function useQuery(options) {
         }); };
         fetchData();
     }, [options.method, options.url, context]);
-    // Function to make a POST request
-    var postData = function (payload) { return __awaiter(_this, void 0, void 0, function () {
+    // Function to make a Execute a request
+    var executeRequest = function (method, payload) { return __awaiter(_this, void 0, void 0, function () {
         var response, responseData, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, , 4]);
                     return [4 /*yield*/, fetch(apiUrl, {
-                            method: "POST",
+                            method: method,
                             headers: __assign(__assign(__assign({ "Content-Type": "application/json" }, headers), context === null || context === void 0 ? void 0 : context.defaultHeaders), { Authorization: (context === null || context === void 0 ? void 0 : context.authToken)
                                     ? "Bearer ".concat(context === null || context === void 0 ? void 0 : context.authToken)
                                     : undefined }),
@@ -132,18 +138,36 @@ function useQuery(options) {
             }
         });
     }); };
-    return { data: data, error: error, isLoading: isLoading, postData: postData };
+    var postData = function (payload) { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, executeRequest("POST", payload)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    var putData = function (payload) { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, executeRequest("PUT", payload)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    var patchData = function (payload) { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, executeRequest("PATCH", payload)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
+    return { data: data, error: error, isLoading: isLoading, postData: postData, putData: putData, patchData: patchData };
 }
 exports.useQuery = useQuery;
-function getUrl(url, context, queryParams) {
-    if (!url && (!context || !context.url)) {
-        throw new Error("URL must be provided in useQuery or context.url must be set when Wrapping around QueryContext");
-    }
-    var $URL = url || context.url;
-    var queryString = "";
-    if (queryParams) {
-        var params = new URLSearchParams(queryParams).toString();
-        queryString = "?".concat(params);
-    }
-    return "".concat($URL).concat(queryString);
-}
