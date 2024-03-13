@@ -97,9 +97,12 @@ root.render(
 
 ## Parameters
 
+- `method` (string): The HTTP method for the request (default: 'GET').
+- `headers` (object): Additional headers to include in the request.
+- `body` (object): The request payload.
+- `queryParams` (object): Query parameters to append to the URL.
 - `url` (string): The URL to which the request will be sent.
-- `options` (object, optional): Optional parameters for configuring the request.
-  - `method` (string): The HTTP method for the request (default: 'GET').
-  - `headers` (object): Additional headers to include in the request.
-  - `body` (object): The request payload.
-  - `queryParams` (object): Query parameters to append to the URL.
+
+
+## Contributing
+If you encounter any issues or have suggestions for improvements, feel free to contribute by opening an issue or submitting a pull request on [GitHub](https://github.com/SAIF-git903).
