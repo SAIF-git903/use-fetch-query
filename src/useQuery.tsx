@@ -10,23 +10,28 @@ export function useQuery(options: Options = {}) {
 
   const context: ClientProviderParamsI | any = useContext(QueryContext);
 
-  // Default Method is set to GET in case user don't provide one.
-  const { method = "GET", headers = {}, body, timeout, queryParams } = options;
-  const apiUrl = getUrl(options.url, context, queryParams);
+  const {
+    method: defaultMethod = "GET",
+    headers: defaultHeaders = {},
+    timeout,
+    queryParams: defaultQueryParams,
+    url: defaultUrl,
+  } = options;
 
-  // useEffect for handling GET request
+  const apiUrl = getUrl(defaultUrl, context, defaultQueryParams);
+
   useEffect(() => {
     const fetchData = async () => {
       setError(null);
 
-      if (method === "GET") {
+      if (defaultMethod === "GET") {
         setIsLoading(true);
         try {
           const response = await fetch(apiUrl, {
-            method,
+            method: defaultMethod,
             headers: {
               "Content-Type": "application/json",
-              ...headers,
+              ...defaultHeaders,
               ...context?.defaultHeaders,
               Authorization: context?.authToken
                 ? `Bearer ${context?.authToken}`
@@ -49,16 +54,15 @@ export function useQuery(options: Options = {}) {
     };
 
     fetchData();
-  }, [options.method, options.url, context]);
+  }, [defaultMethod, defaultUrl, context]);
 
-  // Function to make a Execute a request
   const executeRequest = async (method: string, payload?: any) => {
     try {
       const response = await fetch(apiUrl, {
         method,
         headers: {
           "Content-Type": "application/json",
-          ...headers,
+          ...defaultHeaders,
           ...context?.defaultHeaders,
           Authorization: context?.authToken
             ? `Bearer ${context?.authToken}`
